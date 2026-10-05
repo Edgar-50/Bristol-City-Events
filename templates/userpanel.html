@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BCE · Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/userpanel.css') }}">
+
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+
+  <div id="loader" class="loader">
+    <div class="loader-inner">
+      <div class="loader-ring"></div>
+      <span class="loader-label">BCE</span>
+    </div>
+  </div>
+
+  <canvas id="ambient-bg" aria-hidden="true"></canvas>
+
+  <!-- SIDEBAR NAV -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">B</div>
+      <div class="brand-label">
+        <span class="brand-name">BCE</span>
+        <span class="brand-city">Bristol City Events</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#overview"   class="nav-item active" data-section="overview">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </a>
+      <a href="/events"     class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Events
+      </a>
+      <a href="#tickets"    class="nav-item" data-section="tickets">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 1 1 0-6v6zm0 6a3 3 0 0 0 0 6V15zm20-6a3 3 0 1 0 0-6v6zm0 6a3 3 0 1 1 0 6v-6zM2 9h20M2 15h20"/></svg>
+        My Tickets
+      </a>
+      <a href="#payments"   class="nav-item" data-section="payments">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Payments
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ (session.get('username', 'G') or 'G')[0].upper() }}</div>
+        <div class="user-info">
+          <strong>{{ session.get('username', 'Guest') }}</strong>
+          <span id="studentBadge" style="display:none" class="badge-student">Student</span>
+        </div>
+      </div>
+      <a href="/logout" class="logout-pill">Sign out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="shell" id="mainShell">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" type="button" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="topbar-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="searchInput" placeholder="Search events…" aria-label="Search events">
+      </div>
+
+      <div class="topbar-actions">
+        <button class="notif-btn icon-action" id="notifBtn" type="button" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-dot" id="notifDot" style="display:none"></span>
+        </button>
+        <button class="icon-action" id="themeToggle" type="button" aria-label="Toggle theme">
+          <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="sunIcon"  width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD BODY -->
+    <div class="content">
+
+      <!-- HERO -->
+      <section class="hero" id="overview">
+        <div class="hero-text">
+          <p class="hero-eyebrow">Good to see you back</p>
+          <h1 class="hero-heading">{{ session.get('username', 'Guest') }}<span class="cursor">_</span></h1>
+          <p class="hero-sub">Track tickets, simulate bookings, and explore Bristol's events — all in one place.</p>
+          <div class="hero-ctas">
+            <a href="/events" class="btn btn-primary">Explore Events</a>
+            <button class="btn btn-ghost" id="quickBookBtn" type="button">Quick Book</button>
+          </div>
+        </div>
+
+        <div class="stat-cluster">
+          <div class="stat-card stat-a">
+            <span class="stat-label">Tickets</span>
+            <strong class="stat-value" id="statTickets">—</strong>
+          </div>
+          <div class="stat-card stat-b">
+            <span class="stat-label">Events Live</span>
+            <strong class="stat-value" id="statEvents">—</strong>
+          </div>
+          <div class="stat-card stat-c">
+            <span class="stat-label">Alerts</span>
+            <strong class="stat-value" id="statNotifs">—</strong>
+          </div>
+          <div class="stat-card stat-d accent-card">
+            <span class="stat-label">Total Spent</span>
+            <strong class="stat-value" id="statSpend">—</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY CHART -->
+      <section class="panel" id="activityPanel">
+        <div class="panel-header">
+          <div>
+            <span class="kicker">30-day history</span>
+            <h2>Booking activity</h2>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-pill">Bookings</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="activityChart"></canvas>
+        </div>
+      </section>
+
+      <!-- EVENTS GRID -->
+      <section class="panel" id="eventsPanel">
+        <div class="panel-header">
+          <div>
+            <span class="kicker">Live now</span>
+            <h2>Upcoming events</h2>
+          </div>
+          <div class="filter-row">
+            <select id="categoryFilter" class="select-pill" aria-label="Filter by category">
+              <option value="">All categories</option>
+              <option value="music">Music</option>
+              <option value="sport">Sport</option>
+              <option value="arts">Arts</option>
+              <option value="food">Food</option>
+              <option value="comedy">Comedy</option>
+              <option value="community">Community</option>
+            </select>
+            <a href="/events" class="btn-link">See all →</a>
+          </div>
+        </div>
+        <div id="eventGrid" class="event-grid">
+          {% if events %}
+            {% for event in events %}
+            <article class="event-card" data-id="{{ event.id }}">
+              <div class="event-card-top">
+                <span class="event-badge">{{ event.category or 'Live' }}</span>
+                <span class="event-seats {% if event.remaining_tickets == 0 %}seats-none{% elif event.remaining_tickets < 10 %}seats-low{% endif %}">
+                  {% if event.remaining_tickets == 0 %}Sold out
+                  {% elif event.remaining_tickets < 10 %}{{ event.remaining_tickets }} left
+                  {% else %}Available{% endif %}
+                </span>
+              </div>
+              <h3>{{ event.title }}</h3>
+              <p class="event-date">{{ event.date }}</p>
+              <p class="event-venue">📍 {{ event.venue }}</p>
+              <div class="event-footer">
+                <strong class="event-price">£{{ '%.2f'|format(event.price|float) }}</strong>
+                <button class="btn btn-sm btn-primary" type="button" onclick="openBookingModal('{{ event.id }}')">
+                  Book
+                </button>
+              </div>
+            </article>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <p>No upcoming events found.</p>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- RECOMMENDATIONS + TICKETS -->
+      <div class="two-col">
+
+        <section class="panel" id="recsPanel">
+          <div class="panel-header">
+            <div>
+              <span class="kicker">Picked for you</span>
+              <h2>Recommended</h2>
+            </div>
+          </div>
+          <div id="recGrid" class="rec-grid">
+            <div class="loading-state"><span class="spinner"></span> Loading…</div>
+          </div>
+        </section>
+
+        <section class="panel" id="tickets">
+          <div class="panel-header">
+            <div>
+              <span class="kicker">Your passes</span>
+              <h2>My tickets</h2>
+            </div>
+          </div>
+          <div id="ticketList" class="ticket-stack">
+            {% if tickets %}
+              {% for ticket in tickets %}
+              <div class="ticket-row" data-id="{{ ticket.id }}">
+                <div class="ticket-meta">
+                  <strong>{{ ticket.event }}</strong>
+                  <p>{{ ticket.date }} · {{ ticket.venue }}</p>
+                  <span class="seat-tag">{{ ticket.seat_ref or 'General' }}</span>
+                </div>
+                <canvas class="qr-canvas" data-qr="{{ ticket.receipt_code or ticket.id }}" width="72" height="72"></canvas>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state"><p>No confirmed tickets yet.</p></div>
+            {% endif %}
+          </div>
+        </section>
+
+      </div>
+
+      <!-- TRANSACTIONS / RECEIPTS / SEATS -->
+      <div class="three-col" id="payments">
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="kicker">Payments</span>
+              <h2>Transactions</h2>
+            </div>
+          </div>
+          <div id="txList" class="stack">
+            {% if transactions %}
+              {% for tx in transactions %}
+              <div class="tx-row">
+                <div class="tx-info">
+                  <strong>{{ tx.event }}</strong>
+                  <span>{{ tx.date }}</span>
+                </div>
+                <div class="tx-right">
+                  <strong class="tx-amount">£{{ '%.2f'|format(tx.amount|float) }}</strong>
+                  <span class="tx-status status-{{ tx.status }}">{{ tx.status }}</span>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state"><p>No transactions yet.</p></div>
+            {% endif %}
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="kicker">Receipts</span>
+              <h2>Issued receipts</h2>
+            </div>
+          </div>
+          <div id="receiptList" class="stack">
+            {% if transactions %}
+              {% for tx in transactions %}
+              <div class="receipt-row">
+                <div class="receipt-info">
+                  <strong>{{ tx.event }}</strong>
+                  <span>{{ tx.receipt_code or '—' }}</span>
+                </div>
+                <strong>£{{ '%.2f'|format(tx.amount|float) }}</strong>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state"><p>No receipts yet.</p></div>
+            {% endif %}
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="kicker">Simulation</span>
+              <h2>Seat status</h2>
+            </div>
+          </div>
+          <div class="seat-summary">
+            <div class="seat-row"><span>Available</span><strong id="seatAvail">0</strong></div>
+            <div class="seat-row"><span>Reserved</span><strong id="seatReserved">0</strong></div>
+            <div class="seat-row"><span>Taken</span><strong id="seatTaken">0</strong></div>
+            <div class="seat-progress" id="seatProgress"></div>
+            <button class="btn btn-ghost btn-block" id="shuffleBtn" type="button">Simulate changes</button>
+          </div>
+        </section>
+
+      </div>
+    </div><!-- /content -->
+  </main>
+
+  <!-- TOAST -->
+  <div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+
+  <!-- BOOKING MODAL -->
+  <div id="bookingModal" class="modal" aria-hidden="true">
+    <div class="modal-scrim" id="modalScrim"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+      <div class="modal-head">
+        <div>
+          <span class="kicker">Booking simulator</span>
+          <h2 id="modalTitle">Select event</h2>
+          <p id="modalMeta" class="modal-sub"></p>
+        </div>
+        <button class="icon-action danger" id="modalClose" type="button" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="modal-controls">
+          <label class="field">
+            <span>Quantity</span>
+            <input id="modalQty" type="number" min="1" max="10" value="1">
+          </label>
+
+          <label class="toggle-row" id="studentRow">
+            <input id="modalStudent" type="checkbox">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span>Student discount (10%)</span>
+          </label>
+
+          <div class="price-breakdown">
+            <div class="price-row"><span>Subtotal</span><strong id="modalSub">£0.00</strong></div>
+            <div class="price-row"><span>Discount</span><strong id="modalDisc">−£0.00</strong></div>
+            <div class="price-row total"><span>Total</span><strong id="modalTotal">£0.00</strong></div>
+          </div>
+
+          <button id="confirmBook" class="btn btn-primary btn-block" type="button">
+            Confirm booking
+          </button>
+
+          <p class="modal-note">This is a live booking against the real database.</p>
+        </div>
+
+        <div class="modal-seat-area">
+          <div class="seat-area-head">
+            <h3>Choose a seat</h3>
+            <p>Live from database · auto-updates on shuffle</p>
+          </div>
+          <div id="seatGrid" class="seat-grid"></div>
+          <div class="seat-legend">
+            <span><i class="dot dot-available"></i>Available</span>
+            <span><i class="dot dot-reserved"></i>Reserved</span>
+            <span><i class="dot dot-taken"></i>Taken</span>
+            <span><i class="dot dot-selected"></i>Selected</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap data from Flask -->
+  <script>
+    window.BCE = {{ {
+      "user":          user or {},
+      "events":        events or [],
+      "tickets":       tickets or [],
+      "transactions":  transactions or [],
+      "notifications": notifications or [],
+      "is_student":    (user or {}).get("is_student", False)
+    } | tojson }};
+  </script>
+  <script defer src="{{ url_for('static', filename='js/userpanel.js') }}"></script>
+</body>
+</html>

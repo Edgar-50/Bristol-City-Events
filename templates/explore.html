@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Bristol</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/explore.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark">
+
+<header class="pill-nav-container">
+  <nav class="pill-nav">
+    <a href="{{ url_for('home') }}" class="pill-logo">
+      <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Bristol Logo">
+    </a>
+
+    <ul class="pill-list">
+      <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('events') }}">Events</a></li>
+      <li><a href="{{ url_for('explore') }}" class="active">Explore</a></li>
+      <li><a href="{{ url_for('about') }}">About</a></li>
+      <li><a href="{{ url_for('contact') }}">Contact</a></li>
+    </ul>
+
+    <div class="pill-actions">
+      <button id="theme-toggle" class="icon-btn" type="button">🌙</button>
+      <button id="cart-btn" class="icon-btn" type="button">🛒 <span id="cart-count">0</span></button>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="animated-landscape">
+    <div class="background-container">
+      <div class="front">
+        <span class="ground"></span>
+      </div>
+
+      <div class="middle">
+        <div class="tree one">
+          <span class="top"></span>
+          <span class="overlap"></span>
+          <span class="trunk"></span>
+        </div>
+        <div class="tree two">
+          <span class="top"></span>
+          <span class="overlap"></span>
+          <span class="trunk"></span>
+        </div>
+        <div class="tree three">
+          <span class="top"></span>
+          <span class="overlap"></span>
+          <span class="trunk"></span>
+        </div>
+      </div>
+
+      <div class="back">
+        <span class="hill one"></span>
+        <span class="hill two"></span>
+        <span class="hill three"></span>
+
+        <span class="sun-rays"></span>
+        <span class="sun"></span>
+
+        <div class="cloud one">
+          <span class="cloud-body"></span>
+          <span class="cloud-top"></span>
+          <span class="cloud-puff"></span>
+        </div>
+        <div class="cloud two">
+          <span class="cloud-body"></span>
+          <span class="cloud-top"></span>
+          <span class="cloud-puff"></span>
+        </div>
+      </div>
+
+      <div class="person">
+        <div class="head"></div>
+        <div class="coat"></div>
+        <div class="legs"></div>
+        <div class="arm"></div>
+        <div class="string"></div>
+        <div class="balloon"></div>
+      </div>
+    </div>
+
+    <div class="weather-overlay">
+      <section class="weather-section">
+        <h2 class="section-title">☀️ Live Bristol Weather</h2>
+
+        <div class="weather-cards">
+          <div class="weather-card" id="temp-card">
+            <div class="visual" id="temp-visual"></div>
+            <h3>Temperature</h3>
+            <p id="temp-value">--°C</p>
+            <small id="temp-feels">Feels like: --°C</small>
+          </div>
+
+          <div class="weather-card" id="wind-card">
+            <div class="visual" id="wind-visual"></div>
+            <h3>Wind</h3>
+            <p id="wind-value">-- km/h</p>
+          </div>
+
+          <div class="weather-card" id="rain-card">
+            <div class="visual" id="rain-visual"></div>
+            <h3>Rain</h3>
+            <p id="rain-value">-- mm</p>
+          </div>
+        </div>
+
+        <div class="condition-icon-wrap">
+          <img id="condition-icon" src="{{ url_for('static', filename='assets/sun.svg') }}" alt="Weather icon">
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="map-section">
+    <h2>📍 Explore on the Map</h2>
+    <iframe
+      width="900"
+      height="400"
+      frameborder="0"
+      scrolling="no"
+      marginheight="0"
+      marginwidth="0"
+      id="gmap_canvas"
+      src="https://maps.google.com/maps?width=900&amp;height=400&amp;hl=en&amp;q=Bristol+(Bristol)&amp;t=h&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
+    </iframe>
+  </section>
+
+  <section class="shop-carousel">
+    <h2>🛍️ Bristol Franchise Store</h2>
+    <p class="carousel-subtitle">Official merch from Bristol Events & Culture</p>
+
+    <div class="carousel-container" id="shop-carousel">
+      <div class="shop-card">
+        <img src="{{ url_for('static', filename='assets/shirt.png') }}" alt="Bristol T-shirt">
+        <h3>Bristol Heritage T-Shirt</h3>
+        <p>Soft cotton tee with the iconic Clifton Bridge silhouette.</p>
+        <p class="price">£18.00</p>
+        <button class="buy-btn" data-item="Bristol Heritage T-Shirt" data-price="18.00">Add to Cart</button>
+      </div>
+
+      <div class="shop-card">
+        <img src="{{ url_for('static', filename='assets/notebook.png') }}" alt="Bristol Notebook">
+        <h3>Bristol Sketch Notebook</h3>
+        <p>Recycled paper notebook embossed with Bristol skyline.</p>
+        <p class="price">£9.00</p>
+        <button class="buy-btn" data-item="Bristol Sketch Notebook" data-price="9.00">Add to Cart</button>
+      </div>
+
+      <div class="shop-card">
+        <img src="{{ url_for('static', filename='assets/bottle.png') }}" alt="Bristol Bottle">
+        <h3>Eco Water Bottle</h3>
+        <p>Stay hydrated with this sleek Bristol stainless bottle.</p>
+        <p class="price">£14.50</p>
+        <button class="buy-btn" data-item="Eco Water Bottle" data-price="14.50">Add to Cart</button>
+      </div>
+
+      <div class="shop-card">
+        <img src="{{ url_for('static', filename='assets/bag.png') }}" alt="Bridge Crew Bag">
+        <h3>Bridge Crew Bag</h3>
+        <p>Bag with “Bridge Crew” embroidery — local favourite.</p>
+        <p class="price">£29.00</p>
+        <button class="buy-btn" data-item="Bridge Crew Bag" data-price="29.00">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="social-section">
+    <h2>👥 Connect & Discover</h2>
+    <div class="social-feed">
+      <div class="friend-card">
+        <img src="https://tse3.mm.bing.net/th/id/OIP.x1fZ0UeEnWjtKc3TJIVXdAHaHa?cb=ucfimgc2&pid=Api" alt="">
+        <div>
+          <h4>Amelia</h4>
+          <p>Just bought the <strong>Bridge Crew Bag</strong> — ready for the festival!</p>
+        </div>
+      </div>
+      <div class="friend-card">
+        <img src="https://tse1.mm.bing.net/th/id/OIP.a6rlgDokvqMRuTQOJ37yAwHaHa?cb=ucfimg2&pid=Api&ucfimg=1" alt="">
+        <div>
+          <h4>Josh</h4>
+          <p>Hosting a <strong>Team-Building Pub Quiz 🍻</strong> Friday night!</p>
+        </div>
+      </div>
+      <div class="friend-card">
+        <img src="https://tse3.mm.bing.net/th/id/OIP.x1fZ0UeEnWjtKc3TJIVXdAHaHa?cb=ucfimgc2&pid=Api" alt="">
+        <div>
+          <h4>Sophia</h4>
+          <p>Planning a <strong>Harbourside Art Crawl 🎨</strong> this weekend!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="social-feed">
+    <h2>🎉 Local Friends & Events</h2>
+    <p class="feed-subtitle">Stay connected with Bristol’s heartbeat — events, locals, and moments happening near you.</p>
+    <div class="feed-container" id="feed-container"></div>
+  </section>
+
+  <section class="events-section">
+    <h2>🎯 Team Building & Parties</h2>
+    <div class="events-grid">
+      <div class="event-card">
+        <h3>Escape Room Challenge</h3>
+        <p>Team up to solve Bristol’s mystery puzzles!</p>
+        <button class="join-btn" type="button">Join</button>
+      </div>
+      <div class="event-card">
+        <h3>Clifton Night Ride</h3>
+        <p>Cycle under the bridge lights – unforgettable views!</p>
+        <button class="join-btn" type="button">Join</button>
+      </div>
+      <div class="event-card">
+        <h3>Harbourside Party</h3>
+        <p>Live DJ, food trucks, and fireworks by the water.</p>
+        <button class="join-btn" type="button">Join</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="facts-section">
+    <h2>💡 Did You Know?</h2>
+    <p id="fact-text">Loading fact...</p>
+    <button id="new-fact-btn" type="button">New Fact</button>
+  </section>
+</main>
+
+<div id="cart-modal" class="cart-modal">
+  <div class="cart-content">
+    <h3>Your Cart</h3>
+    <ul id="cart-items"></ul>
+    <button id="checkout-btn" type="button">Checkout</button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/explore.js') }}"></script>
+</body>
+</html>

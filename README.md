@@ -1,60 +1,57 @@
-<div align="center">
+# UWE Event System - Flask Conversion Starter
 
-# Bristol City Events — Full-Stack Event Management Platform
+This package converts your static project into a Flask application with a minimal database layer and without changing the structure too much.
 
-### Discover events. Book tickets. Manage venues. Track revenue. Run the entire event operation from one Flask application.
+## What is included
+- `app.py` - Flask application with page routes and JSON API endpoints
+- `db.py` - reusable `Database` class using SQLite
+- `convert_to_flask.py` - copies your original HTML/CSS/JS/assets into Flask folders and rewrites links
+- `templates/placeholder.html` - fallback page until your originals are copied
+- `requirements.txt` - dependencies
 
-![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![Socket.IO](https://img.shields.io/badge/Socket.IO-Realtime-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
-![ReportLab](https://img.shields.io/badge/PDF-Receipts-B30B00?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)
+## Database tables
+- `users`
+- `events`
+- `contacts`
+- `bookings`
 
-**BCE** is a full-stack event booking and administration system built around Flask + MySQL, realtime booking updates, role-based access control, ticket inventory, waiting lists, PDF receipts, and operational analytics.
+## Improvements added
+- password hashing with Werkzeug
+- parameterized queries to avoid SQL injection
+- booking transaction handling
+- seed route for demo data
+- event filtering API
+- contact submission API
+- login + registration API
+- admin/user route protection via session checks
+- indexes on commonly queried database fields
 
-</div>
+## How to use
+1. Copy your original files into this same folder, next to `app.py`.
+2. Install dependencies:
+   `pip install -r requirements.txt`
+3. Run the converter:
+   `python convert_to_flask.py`
+4. Start the app:
+   `python app.py`
+5. Open:
+   `http://127.0.0.1:5000/`
+6. Seed sample data if needed:
+   `http://127.0.0.1:5000/seed`
 
-## Core capabilities
+## Important note
+Your original frontend JavaScript may still point to old static-only logic. The core Flask API endpoints provided are:
+- `POST /login`
+- `POST /api/register`
+- `GET /api/events`
+- `POST /api/events`
+- `POST /api/contact`
+- `POST /api/bookings`
 
-- Event discovery and filtering
-- Registration, login and session authentication
-- Role-based user/admin dashboards
-- Capacity-aware ticket booking
-- Waiting-list fallback
-- Booking cancellation and refunds
-- PDF receipt generation
-- Flask-SocketIO realtime booking updates
-- Event, venue and category administration
-- User and role management
-- Revenue, booking and venue analytics
+You may only need small edits in your original JS files so they fetch these endpoints.
 
-## Architecture
+## Demo admin account after seeding
+- Email: `admin@uweevents.local`
+- Password: `admin123`
 
-```mermaid
-flowchart TB
-    UI[HTML / CSS / JavaScript] --> FLASK[Flask Application]
-    FLASK --> AUTH[Session Auth + Role Guards]
-    FLASK --> API[JSON APIs]
-    FLASK --> SOCKET[Flask-SocketIO]
-    FLASK --> PDF[ReportLab]
-    FLASK --> MODELS[Database Layer]
-    MODELS --> MYSQL[(MySQL)]
-```
-
-## Production deployment
-
-The production build is configured for Render with Gunicorn. Runtime secrets and MySQL credentials must be provided through environment variables.
-
-```env
-FLASK_SECRET_KEY=change-me
-DB_HOST=your-host
-DB_PORT=3306
-DB_USER=your-user
-DB_PASSWORD=your-password
-DB_NAME=bce_event_system
-```
-
-## Author
-
-**Edgar Charles Omondi**  
-GitHub: [@Edgar-50](https://github.com/Edgar-50)
+Change that immediately outside demo mode, because leaving it there would be a security goblin.

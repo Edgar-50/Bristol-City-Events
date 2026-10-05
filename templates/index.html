@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bristol City Events</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='assets/favicon.png') }}" type="image/png">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <header class="pill-nav-container">
+    <nav class="pill-nav" aria-label="Main Navigation">
+      <a href="{{ url_for('home') }}" class="pill-logo">
+        <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Bristol City Events Logo">
+      </a>
+
+      <ul class="pill-list">
+        <li><a href="{{ url_for('home') }}" class="pill active">Home</a></li>
+        <li><a href="{{ url_for('events') }}" class="pill">Events</a></li>
+        <li><a href="{{ url_for('explore') }}" class="pill">Explore</a></li>
+        <li><a href="{{ url_for('about') }}" class="pill">About</a></li>
+        <li><a href="{{ url_for('contact') }}" class="pill">Contact</a></li>
+      </ul>
+
+      <div class="pill-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+          🌙
+        </button>
+
+        <button id="login-btn" class="icon-btn" aria-label="Login/Register">
+          <svg class="lock" viewBox="0 0 24 24">
+            <path d="M17 8V6a5 5 0 0 0-10 0v2H5v14h14V8h-2zm-8-2a3 3 0 0 1 6 0v2H9V6zm8 14H7V10h10v10z"/>
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <video autoplay muted loop playsinline preload="auto" class="hero-video">
+      <source src="{{ url_for('static', filename='assets/bg-video.mp4') }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="hero-content">
+      <h1>Bristol City Events</h1>
+      <p>Experience the heart of creativity, culture, and community in Bristol.</p>
+      <a href="{{ url_for('events') }}" class="btn">Discover Events</a>
+    </div>
+
+    <div class="scroll-down"><span></span></div>
+  </section>
+
+  <section class="carousel-section">
+    <h2 class="section-title">City Highlights</h2>
+    <div class="carousel-container" id="carousel">
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel1.jpg') }}" alt="Harbour Festival">
+        <h3>Bristol Harbour Festival</h3>
+        <p>Celebrate music, food, and boats along the iconic Harbourside.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel2.jpg') }}" alt="St Paul's Carnival">
+        <h3>St Paul’s Carnival</h3>
+        <p>Vibrant parades, Caribbean food, and cultural unity.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel3.jpg') }}" alt="Balloon Fiesta">
+        <h3>International Balloon Fiesta</h3>
+        <p>See hundreds of hot air balloons light up the summer skies.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel4.jpg') }}" alt="Street Art Tour">
+        <h3>Street Art & Banksy Tour</h3>
+        <p>Explore the city’s artistic soul with guided mural tours.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel5.jpg') }}" alt="Winter Market">
+        <h3>Bristol Winter Market</h3>
+        <p>Festive food, artisan stalls, and seasonal magic.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel6.jpg') }}" alt="Harbourside Night Market">
+        <h3>Harbourside Night Market</h3>
+        <p>Local crafts, street food, and live performances under the stars.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel7.jpg') }}" alt="Bristol Zoo">
+        <h3>Bristol Zoo</h3>
+        <p>Visit over 400 species in the heart of the city.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel8.jpg') }}" alt="Bristol Cathedral">
+        <h3>Bristol Cathedral</h3>
+        <p>A stunning medieval Gothic cathedral with a rich history.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel9.jpg') }}" alt="Clifton Suspension Bridge">
+        <h3>Clifton Suspension Bridge</h3>
+        <p>One of the UK's most iconic landmarks, spanning the Avon Gorge.</p>
+      </div>
+      <div class="card">
+        <img src="{{ url_for('static', filename='assets/carousel10.jpg') }}" alt="Bristol Old Vic">
+        <h3>Bristol Old Vic</h3>
+        <p>Catch world-class theater performances in the UK's oldest continually operating theater.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="details-bar">
+    <div class="detail-item"><h3>🎉 Events</h3><p><strong>200+</strong> festivals, concerts, and community gatherings annually.</p></div>
+    <div class="detail-item"><h3>🎨 Culture</h3><p><strong>50+</strong> art venues and creative spaces across the city.</p></div>
+    <div class="detail-item"><h3>🌍 Visitors</h3><p><strong>1M+</strong> people enjoying Bristol’s vibrant life.</p></div>
+  </section>
+
+  <section class="chart-section">
+    <h2 class="section-title">Event Attendance Overview</h2>
+    <canvas id="attendanceChart" width="400" height="200"></canvas>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-about">
+        <h3>About Bristol City Events</h3>
+        <p>Your hub for everything happening in Bristol — from festivals to hidden local gems.</p>
+      </div>
+
+      <div class="footer-links">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('events') }}">Events</a></li>
+          <li><a href="#">News</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-newsletter">
+        <h3>Stay Updated</h3>
+        <form>
+          <input type="email" placeholder="Enter your email">
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+
+      <div class="footer-social">
+        <h3>Follow Us</h3>
+        <div class="social-icons">
+          <a href="#"><img src="{{ url_for('static', filename='assets/icons/facebook.svg') }}" alt="Facebook"></a>
+          <a href="#"><img src="{{ url_for('static', filename='assets/icons/twitter.svg') }}" alt="Twitter"></a>
+          <a href="#"><img src="{{ url_for('static', filename='assets/icons/instagram.svg') }}" alt="Instagram"></a>
+        </div>
+      </div>
+    </div>
+    <p class="footer-bottom">© 2025 Bristol City Events | Designed by Edgar Charles</p>
+  </footer>
+
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>🔐 Login / Register</h2>
+      <form>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="btn">Login</button>
+        <p>Don't have an account? <a href="{{ url_for('login') }}">Register</a></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

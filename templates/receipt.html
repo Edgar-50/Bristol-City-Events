@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Receipt</title>
+</head>
+<body>
+  <h1>Booking Receipt</h1>
+
+  <p><strong>Receipt Code:</strong> {{ receipt.receipt_code }}</p>
+  <p><strong>User:</strong> {{ receipt.username }}</p>
+  <p><strong>Email:</strong> {{ receipt.email }}</p>
+  <p><strong>Event:</strong> {{ receipt.event_name }}</p>
+  <p><strong>Venue:</strong> {{ receipt.venue_name }}</p>
+  <p><strong>Date:</strong> {{ receipt.start_datetime }}</p>
+  <p><strong>Tickets:</strong> {{ receipt.num_tickets }}</p>
+  <p><strong>Gross Price:</strong> £{{ receipt.gross_price }}</p>
+  <p><strong>Student Discount:</strong> £{{ receipt.student_discount_amount }}</p>
+  <p><strong>Advance Discount:</strong> £{{ receipt.advance_discount_amount }}</p>
+  <p><strong>Final Price:</strong> £{{ receipt.final_price }}</p>
+
+  <p><a href="{{ url_for('profile_bookings') }}">Back to Bookings</a></p>
+</body>
+</html>

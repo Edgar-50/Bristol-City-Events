@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bristol City Events | About</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+</head>
+
+<body>
+
+<header class="pill-nav-container">
+  <nav class="pill-nav">
+    <a href="{{ url_for('home') }}" class="pill-logo">
+      <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Bristol Logo">
+    </a>
+
+    <ul class="pill-list">
+      <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('events') }}">Events</a></li>
+      <li><a href="{{ url_for('explore') }}">Explore</a></li>
+      <li><a href="{{ url_for('about') }}" class="active">About</a></li>
+      <li><a href="{{ url_for('contact') }}">Contact</a></li>
+    </ul>
+
+    <div class="pill-actions">
+      <button id="theme-toggle" class="icon-btn">🌙</button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero-section">
+  <canvas id="particles"></canvas>
+
+  <div class="hero-content">
+    <h1>About BCE Initiative</h1>
+    <p>Powering local events, charity, and community innovation.</p>
+    <a href="#carousel-container" class="btn hero-btn">Explore Events</a>
+  </div>
+
+  <div class="floating-shapes">
+    <div class="shape circle"></div>
+    <div class="shape triangle"></div>
+    <div class="shape square"></div>
+  </div>
+</section>
+
+<section class="carousel-section section">
+  <h2>Featured Events & Projects</h2>
+  <div id="carousel-container"></div>
+</section>
+
+<section class="charity-section section">
+  <h2>Support the Community</h2>
+  <p>Your donations go directly to local causes.</p>
+  <button class="donate-btn" onclick="window.open('https://your-donation-link.com','_blank')">
+    Donate Now
+  </button>
+</section>
+
+<!-- FIXED CLASS NAME -->
+<section class="ai-section section">
+  <h2>Meet Our AI Chat</h2>
+
+  <div class="ai-container" id="ai-response"></div>
+
+  <div class="ai-input-container">
+    <textarea id="ai-input" placeholder="Type something..."></textarea>
+    <button id="ai-send">Send</button>
+  </div>
+</section>
+
+<!-- FIXED COMMENT -->
+<section class="bce-section section">
+  <h2>BCE</h2>
+
+  <div class="bce-banner">
+    <img src="{{ url_for('static', filename='assets/bce-banner.png') }}" alt="BCE Banner">
+  </div>
+
+  <p class="bce-description"></p>
+</section>
+
+<footer>
+  <p>&copy; 2025 Bristol City Events</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/about.js') }}"></script>
+</body>
+</html>

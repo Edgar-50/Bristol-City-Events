@@ -1,0 +1,512 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  transition: 0.4s ease-in-out;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a, #1c1c1c);
+  color: #fff;
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background 0.5s, color 0.5s;
+}
+
+body.light {
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  color: #111;
+}
+
+/* === Header === */
+.pill-nav-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.pill-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2.5rem;
+  background: rgba(17, 17, 17, 0.85);
+  backdrop-filter: blur(20px) saturate(150%);
+  border-radius: 50px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 6px 25px rgba(255, 0, 76, 0.35);
+  transition: 0.4s;
+}
+
+body.light .pill-nav {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 20px rgba(255, 0, 76, 0.15);
+}
+
+.pill-logo img {
+  height: 36px;
+  transition: 0.3s;
+}
+
+.pill-logo:hover img {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.pill-list {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.pill-list a {
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 6px 0;
+  transition: 0.3s;
+}
+
+.pill-list a.active,
+.pill-list a:hover {
+  color: #ff0080;
+}
+
+.pill-list a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: #ff0080;
+  border-radius: 3px;
+  transition: 0.3s;
+}
+
+.pill-list a:hover::after,
+.pill-list a.active::after {
+  width: 100%;
+}
+
+.pill-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+#theme-toggle.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: transform 0.3s, background 0.3s, color 0.3s;
+}
+
+#theme-toggle.icon-btn:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* === Hero === */
+.hero-section {
+  position: relative;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #ff0080, #ff6699, #ffccff);
+  opacity: 0.15;
+  z-index: 0;
+  animation: gradientShift 15s ease infinite;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  animation: fadeIn 1s ease forwards;
+}
+
+.hero-content h1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #ff0080, #ff66aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #ccc;
+}
+
+body.light .hero-content p {
+  color: #555;
+}
+
+.hero-btn {
+  padding: 14px 32px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ff0080, #ff66aa);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.hero-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(255, 0, 76, 0.4);
+}
+
+/* === Sections === */
+.section {
+  padding: 100px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.section h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  color: #ff66aa;
+}
+
+.section p {
+  color: #ccc;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+body.light .section p {
+  color: #333;
+}
+
+/* === Contact Form === */
+.contact-section form {
+  max-width: 650px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 40px rgba(255, 0, 76, 0.25);
+}
+
+.contact-section input,
+.contact-section textarea {
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  outline: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 1rem;
+  transition: 0.3s;
+  resize: none;
+}
+
+body.light .contact-section input,
+body.light .contact-section textarea {
+  background: #f5f5f5;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.contact-section input:focus,
+.contact-section textarea:focus {
+  border-color: #ff0080;
+  box-shadow: 0 0 12px rgba(255, 0, 76, 0.3);
+}
+
+.contact-section button {
+  padding: 14px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ff0080, #ff66aa);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.contact-section button:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 30px rgba(255, 0, 76, 0.35);
+}
+
+#form-feedback {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #ff66aa;
+}
+
+.flash-message {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.flash-message.success {
+  background: rgba(40, 167, 69, 0.15);
+  color: #8ff0a4;
+}
+
+.flash-message.error {
+  background: rgba(220, 53, 69, 0.15);
+  color: #ff9ca8;
+}
+
+/* === AI Chat === */
+.ai-chat-section {
+  max-width: 720px;
+  margin: 4rem auto;
+  padding: 2.5rem 2rem;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(25px) saturate(150%);
+  border-radius: 30px;
+  box-shadow: 0 25px 70px rgba(255, 0, 76, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: relative;
+}
+
+.ai-chat-section h2 {
+  text-align: center;
+  color: #ff66aa;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(255, 102, 170, 0.5);
+}
+
+.ai-chat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #ff66aa transparent;
+}
+
+.ai-chat-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-chat-box::-webkit-scrollbar-thumb {
+  background: #ff66aa;
+  border-radius: 3px;
+}
+
+.ai-chat-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-message {
+  padding: 14px 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 80%;
+  word-wrap: break-word;
+  backdrop-filter: blur(5px);
+}
+
+body.light .ai-message {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111;
+}
+
+.ai-message.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #ff0080, #ff66aa);
+  color: #fff;
+  box-shadow: 0 0 15px #ff0080, 0 0 35px #ff66aa;
+  font-weight: 500;
+}
+
+.ai-message.bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ff99cc;
+  box-shadow: 0 0 12px rgba(255, 0, 76, 0.25);
+  font-weight: 500;
+}
+
+body.light .ai-message.bot {
+  background: rgba(0, 0, 0, 0.06);
+  color: #ff0080;
+}
+
+.ai-input-container {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  align-items: center;
+}
+
+.ai-input-container textarea {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1rem;
+  resize: none;
+  box-shadow: inset 0 0 12px rgba(255, 0, 76, 0.25);
+}
+
+body.light .ai-input-container textarea {
+  background: rgba(0, 0, 0, 0.08);
+  color: #111;
+}
+
+.ai-input-container textarea:focus {
+  box-shadow: 0 0 20px #ff0080, 0 0 40px #ff66aa inset;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ai-input-container button {
+  position: relative;
+  overflow: hidden;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #ff0080, #ff66aa);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 25px rgba(255, 0, 76, 0.35), 0 0 20px rgba(255, 102, 170, 0.2);
+  transition: 0.3s, transform 0.25s, box-shadow 0.3s, background 0.4s;
+}
+
+.ai-input-container button:hover {
+  transform: translateY(-3px) scale(1.1);
+  background: linear-gradient(135deg, #fff, #ff99cc);
+  color: #ff0080;
+  box-shadow: 0 0 35px #ff0080, 0 0 70px #ff66aa, 0 0 15px #fff;
+}
+
+/* === Map === */
+.map-section {
+  text-align: center;
+}
+
+.map-placeholder {
+  margin: 0 auto;
+  max-width: 500px;
+  padding: 50px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 30px rgba(255, 0, 76, 0.2);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* === Footer === */
+footer {
+  background: #111;
+  color: #ccc;
+  padding: 60px 20px;
+}
+
+body.light footer {
+  background: #f5f5f5;
+  color: #222;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.footer-container h3 {
+  color: #ff66aa;
+  margin-bottom: 10px;
+}
+
+.social-icons img {
+  width: 28px;
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
+.social-icons img:hover {
+  transform: scale(1.2);
+  filter: brightness(1.3);
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* === Animations === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .pill-nav {
+    padding: 0.8rem 1rem;
+  }
+
+  .hero-section {
+    height: 65vh;
+  }
+
+  .contact-section form {
+    padding: 20px;
+  }
+
+  .ai-chat-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+  }
+}

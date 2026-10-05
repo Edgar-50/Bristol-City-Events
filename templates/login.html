@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Login / Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+</head>
+<body class="dark">
+  <canvas id="bg"></canvas>
+
+  <div class="controls">
+    <div id="themeToggle" class="theme-toggle">
+      <span class="icon moon">🌙</span>
+      <div class="thumb"></div>
+      <span class="icon sun">☀️</span>
+    </div>
+
+    <div id="soundToggle" class="sound-bar">
+      <div class="sound-track"></div>
+      <div class="sound-thumb"></div>
+      <span class="sound-icon">🔇</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card {% if show_register %}flip{% endif %}" id="card">
+      <div class="front">
+        <h2>Welcome Back</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-wrap">
+              {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <a href="#" class="forgot">Forgot password?</a>
+          <button type="submit">Login</button>
+
+          <div class="google-btn" role="button" tabindex="0">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
+            <span>Sign in with Google</span>
+          </div>
+
+          <p>Don't have an account? <a href="#" id="flipToRegister">Register</a></p>
+        </form>
+      </div>
+
+      <div class="back">
+        <h2>Create Account</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages and show_register %}
+            <div class="flash-wrap">
+              {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+          <input type="text" name="username" placeholder="Username" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit">Register</button>
+          <p>Already have an account? <a href="#" id="flipToLogin">Login</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgAudio" loop>
+    <source src="{{ url_for('static', filename='assets/background.mp3') }}" type="audio/mpeg" />
+  </audio>
+
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

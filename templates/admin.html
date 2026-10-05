@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BCE · Admin Control</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <!-- ── FIX: removed `defer` so Chart.js is available synchronously
+             before admin.js runs. With defer, window.Chart was undefined
+             when admin.js executed, causing a silent crash that prevented
+             switchTab() from ever completing. ── -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<canvas id="ambient-bg" aria-hidden="true"></canvas>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">B</div>
+    <div class="brand-label">
+      <span class="brand-name">BCE</span>
+      <span class="brand-city">Control Panel</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item" data-tab="overview" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </button>
+    <button class="nav-item" data-tab="events" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Events
+    </button>
+    <button class="nav-item" data-tab="venues" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Venues
+    </button>
+    <button class="nav-item" data-tab="bookings" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 1 1 0-6v6zm0 6a3 3 0 0 0 0 6V15zm20-6a3 3 0 1 0 0-6v6zm0 6a3 3 0 1 1 0 6v-6zM2 9h20M2 15h20"/></svg>
+      Bookings
+    </button>
+    <button class="nav-item" data-tab="users" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" data-tab="reports" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </button>
+    <button class="nav-item" data-tab="logs" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Audit Log
+    </button>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="{{ url_for('userpanel') }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      User Panel
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-badge">
+      <div class="admin-avatar">{{ (current_user_name or 'A')[0].upper() }}</div>
+      <div class="admin-info">
+        <strong>{{ current_user_name or 'Admin' }}</strong>
+        <span>Administrator</span>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-pill">Sign out</a>
+  </div>
+</aside>
+
+<!-- ══ SHELL ══════════════════════════════════════════════════════ -->
+<main class="shell">
+  <header class="topbar">
+    <button class="hamburger" id="hamburger" type="button">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="topbar-title" id="topbarTitle">Overview</span>
+    <code class="topbar-clock" id="liveClock">——</code>
+    <div class="topbar-actions">
+      <button class="icon-action" id="themeToggle" type="button">
+        <svg id="moonIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="sunIcon"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-stack">
+      {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">
+        {% if cat == 'success' %}✓{% elif cat == 'error' %}✕{% else %}›{% endif %} {{ msg }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-overview">
+      <div class="stat-row">
+        <div class="stat-card cyan">
+          <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <span class="stat-label">Active Events</span>
+          <strong class="stat-value" data-count="{{ total_events or 0 }}">{{ total_events or 0 }}</strong>
+          <span class="stat-sub">Upcoming in DB</span>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div>
+          <span class="stat-label">Revenue</span>
+          <strong class="stat-value" data-count="{{ (total_revenue or 0)|int }}" data-prefix="£">£{{ "%.0f"|format(total_revenue or 0) }}</strong>
+          <span class="stat-sub">Confirmed bookings</span>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <span class="stat-label">Total Users</span>
+          <strong class="stat-value" data-count="{{ total_users or 0 }}">{{ total_users or 0 }}</strong>
+          <span class="stat-sub">{{ student_count or 0 }} students</span>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 1 1 0-6v6zm0 6a3 3 0 0 0 0 6V15zm20-6a3 3 0 1 0 0-6v6zm0 6a3 3 0 1 1 0 6v-6zM2 9h20M2 15h20"/></svg></div>
+          <span class="stat-label">Bookings</span>
+          <strong class="stat-value" data-count="{{ total_bookings or 0 }}">{{ total_bookings or 0 }}</strong>
+          <span class="stat-sub">{{ waiting_count or 0 }} on waitlist</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div><span class="kicker">Platform activity</span><h2>Booking Trend — Last 30 Days</h2></div>
+        </div>
+        <div class="graph-wrap"><canvas id="activityChart"></canvas></div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div><span class="kicker">Recent</span><h2>Latest Bookings</h2></div>
+            <button class="btn btn-ghost btn-sm" data-goto="bookings" type="button">All →</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Event</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>
+                {% for b in (bookings or [])[:8] %}
+                <tr>
+                  <td class="cell-name">{{ b.user }}</td>
+                  <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ b.event }}</td>
+                  <td class="cell-mono">£{{ "%.2f"|format(b.amount|float) }}</td>
+                  <td><span class="badge badge-{{ b.status }}">{{ b.status }}</span></td>
+                </tr>
+                {% else %}<tr><td colspan="4" class="empty">No bookings yet</td></tr>{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div><span class="kicker">Capacity watch</span><h2>Ticket Availability</h2></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Event</th><th>Category</th><th>Remaining</th></tr></thead>
+              <tbody>
+                {% for e in (events or [])[:10] %}
+                <tr>
+                  <td class="cell-name" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.title }}</td>
+                  <td><span class="badge badge-sport">{{ e.category }}</span></td>
+                  <td>
+                    {% set rem = e.remaining_tickets|int %}{% set cap = e.capacity|int %}
+                    <span class="cell-mono" style="color:{% if rem==0 %}var(--red){% elif rem<20 %}var(--yellow){% else %}var(--green){% endif %}">
+                      {{ rem }}/{{ cap }}
+                    </span>
+                  </td>
+                </tr>
+                {% else %}<tr><td colspan="3" class="empty">No events</td></tr>{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EVENTS ══════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-events">
+      <div class="filter-bar panel">
+        <div class="filter-bar-inner">
+          <div class="search-bar" style="flex:1;max-width:280px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="eventSearchInput" type="search" placeholder="Search events or venue…">
+          </div>
+          <select id="eventCategoryFilter" class="select-inline">
+            <option value="">All categories</option>
+            {% for cat in (categories or []) %}
+            <option value="{{ cat.category_name }}">{{ cat.category_name }}</option>
+            {% endfor %}
+          </select>
+          <select id="eventStatusFilter" class="select-inline">
+            <option value="">All statuses</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" id="filterEventsBtn" type="button">Filter</button>
+          <button class="btn btn-ghost btn-sm" id="clearEventFilter" type="button">Clear</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div><span class="kicker">Create</span><h2>Add Event</h2></div>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('addCatForm').classList.toggle('hidden')" type="button">+ Category</button>
+          </div>
+          <form id="addCatForm" class="hidden" method="POST" action="{{ url_for('admin_add_category') }}" style="margin-bottom:14px">
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="field" style="flex:1;margin:0">
+                <input type="text" name="category_name" placeholder="New category name" required>
+              </div>
+              <button class="btn btn-primary btn-sm" type="submit">Add</button>
+            </div>
+          </form>
+          <form method="POST" action="{{ url_for('admin_add_event') }}">
+            <div class="form-grid">
+              <div class="field form-full">
+                <label>Event name *</label>
+                <input type="text" name="event_name" placeholder="e.g. Bristol Rovers vs Cheltenham" required>
+              </div>
+              <div class="field">
+                <label>Category *</label>
+                <select name="category_id" required>
+                  <option value="">Select…</option>
+                  {% for cat in (categories or []) %}
+                  <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label>Venue *</label>
+                <select name="venue_id" required>
+                  <option value="">Select…</option>
+                  {% for v in (venues or []) %}
+                  <option value="{{ v.id }}">{{ v.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label>Start *</label>
+                <input type="datetime-local" name="start_datetime" required>
+              </div>
+              <div class="field">
+                <label>End *</label>
+                <input type="datetime-local" name="end_datetime" required>
+              </div>
+              <div class="field">
+                <label>Last booking date *</label>
+                <input type="date" name="last_booking_date" required>
+              </div>
+              <div class="field">
+                <label>Base price (£) *</label>
+                <input type="number" step="0.01" min="0" name="base_price" placeholder="0.00" required>
+              </div>
+              <div class="field">
+                <label>Total tickets *</label>
+                <input type="number" min="1" name="total_tickets" placeholder="100" required>
+              </div>
+              <div class="field form-full">
+                <label>Description</label>
+                <textarea name="description" placeholder="Event details…"></textarea>
+              </div>
+              <label class="check-row"><input type="checkbox" name="is_multi_day"> Multi-day event</label>
+              <label class="check-row"><input type="checkbox" name="formal_dress_required"> Formal dress</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Add Event</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div><span class="kicker">{{ events|length }} events</span><h2>All Events</h2></div>
+          </div>
+          <div class="table-wrap">
+            <table id="eventsTable">
+              <thead>
+                <tr><th>Event</th><th>Category</th><th>Date</th><th>£</th><th>Seats</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="eventsTableBody">
+                {% for e in (events or []) %}
+                <tr data-category="{{ e.category }}" data-status="{{ e.status }}" data-title="{{ e.title|lower }}" data-venue="{{ e.venue|lower }}">
+                  <td>
+                    <span class="cell-name">{{ e.title }}</span>
+                    <div class="cell-sub">{{ e.venue }}</div>
+                  </td>
+                  <td><span class="badge badge-sport">{{ e.category }}</span></td>
+                  <td class="cell-mono">{{ e.date }}</td>
+                  <td class="cell-mono">{{ "%.2f"|format(e.price|float) }}</td>
+                  <td>
+                    {% set rem = e.remaining_tickets|int %}
+                    <span class="cell-mono" style="color:{% if rem==0 %}var(--red){% elif rem<20 %}var(--yellow){% else %}var(--green){% endif %}">
+                      {{ rem }}/{{ e.capacity }}
+                    </span>
+                  </td>
+                  <td>
+                    <form method="POST" action="{{ url_for('admin_update_event_status', event_id=e.id) }}" style="display:inline">
+                      <select name="status" class="select-inline" onchange="this.form.submit()">
+                        <option value="upcoming"  {% if e.status=='upcoming'  %}selected{% endif %}>Upcoming</option>
+                        <option value="active"    {% if e.status=='active'    %}selected{% endif %}>Active</option>
+                        <option value="completed" {% if e.status=='completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if e.status=='cancelled' %}selected{% endif %}>Cancelled</option>
+                      </select>
+                    </form>
+                  </td>
+                  <td>
+                    <div class="action-row">
+                      <button class="btn btn-ghost btn-sm"
+                              onclick="openEditModal({{ e|tojson }})" type="button">Edit</button>
+                      <button class="btn btn-ghost btn-sm"
+                              onclick="openCapacityModal({{ e.id }}, '{{ e.title|replace("'","") }}', {{ e.capacity }})" type="button">Cap</button>
+                      <form method="POST" action="{{ url_for('admin_delete_event', event_id=e.id) }}"
+                            onsubmit="return confirm('Delete \'{{ e.title|replace("'","") }}\'?')">
+                        <button class="btn btn-danger btn-sm" type="submit">Del</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="empty">No events in database</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VENUES ══════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-venues">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><div><span class="kicker">Create</span><h2>Add Venue</h2></div></div>
+          <form method="POST" action="{{ url_for('admin_add_venue') }}">
+            <div class="form-grid">
+              <div class="field form-full">
+                <label>Venue name *</label>
+                <input type="text" name="venue_name" placeholder="e.g. Memorial Stadium" required>
+              </div>
+              <div class="field form-full">
+                <label>Address *</label>
+                <textarea name="address" placeholder="Full address…" required></textarea>
+              </div>
+              <div class="field">
+                <label>Capacity *</label>
+                <input type="number" name="capacity" placeholder="500" required min="1">
+              </div>
+              <div class="field">
+                <label>Suitable for</label>
+                <input type="text" name="suitable_for" placeholder="Sport, Music…">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Add Venue</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div><span class="kicker">{{ venues|length }} venues</span><h2>Venue List</h2></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Address</th><th>Capacity</th><th>Suitable for</th><th>Active</th></tr></thead>
+              <tbody>
+                {% for v in (venues or []) %}
+                <tr>
+                  <td class="cell-name">{{ v.name }}</td>
+                  <td class="cell-sub" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ v.address or '—' }}</td>
+                  <td class="cell-mono">{{ v.capacity }}</td>
+                  <td><span class="badge badge-sport">{{ v.suitable_for or '—' }}</span></td>
+                  <td>
+                    <span class="badge {% if v.is_active %}badge-confirmed{% else %}badge-cancelled{% endif %}">
+                      {{ 'Yes' if v.is_active else 'No' }}
+                    </span>
+                  </td>
+                </tr>
+                {% else %}<tr><td colspan="5" class="empty">No venues yet</td></tr>{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BOOKINGS ════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-bookings">
+      <div class="panel">
+        <div class="panel-header">
+          <div><span class="kicker">{{ bookings|length }} total</span><h2>All Bookings</h2></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="search-bar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="bookingSearch" type="search" placeholder="Search bookings…">
+            </div>
+            <select id="bookingStatusFilter" class="select-inline">
+              <option value="">All statuses</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="refunded">Refunded</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="bookingsTable">
+            <thead>
+              <tr><th>#</th><th>User</th><th>Event</th><th>Date</th><th>Tickets</th><th>Amount</th><th>Receipt</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for b in (bookings or []) %}
+              <tr data-status="{{ b.status }}">
+                <td class="cell-mono">{{ b.id }}</td>
+                <td>
+                  <span class="cell-name">{{ b.user }}</span>
+                  <div class="cell-sub">{{ b.user_email }}</div>
+                </td>
+                <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ b.event }}</td>
+                <td class="cell-mono">{{ b.date }}</td>
+                <td class="cell-mono">{{ b.num_tickets }}</td>
+                <td class="cell-mono">£{{ "%.2f"|format(b.amount|float) }}</td>
+                <td class="cell-mono" style="font-size:.7rem">{{ (b.receipt_code or '—')[:16] }}</td>
+                <td><span class="badge badge-{{ b.status }}">{{ b.status }}</span></td>
+                <td>
+                  <div class="action-row">
+                    {% if b.status == 'confirmed' %}
+                    <form method="POST" action="{{ url_for('admin_cancel_booking', booking_id=b.id) }}"
+                          onsubmit="return confirm('Cancel booking #{{ b.id }}?')">
+                      <button class="btn btn-danger btn-sm" type="submit">Cancel</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin_refund_booking', booking_id=b.id) }}"
+                          onsubmit="return confirm('Refund booking #{{ b.id }}?')">
+                      <button class="btn btn-ghost btn-sm" type="submit">Refund</button>
+                    </form>
+                    {% else %}
+                    <span class="cell-mono">—</span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="9" class="empty">No bookings found</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% if waiting_list %}
+      <div class="panel">
+        <div class="panel-header">
+          <div><span class="kicker">{{ waiting_list|length }} entries</span><h2>Waiting List</h2></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Email</th><th>Event</th><th>Joined</th></tr></thead>
+            <tbody>
+              {% for w in waiting_list %}
+              <tr>
+                <td class="cell-name">{{ w.username }}</td>
+                <td class="cell-mono">{{ w.email }}</td>
+                <td>{{ w.event_name }}</td>
+                <td class="cell-mono">{{ w.created_at }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ══ USERS ════════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-users">
+      <div class="panel" style="margin-bottom:0">
+        <div class="panel-header">
+          <div><span class="kicker">Create account</span><h2>Add User</h2></div>
+        </div>
+        <form method="POST" action="{{ url_for('admin_add_user') }}">
+          <div class="form-grid">
+            <div class="field">
+              <label>Username *</label>
+              <input type="text" name="username" placeholder="john_doe" required>
+            </div>
+            <div class="field">
+              <label>Email *</label>
+              <input type="email" name="email" placeholder="john@example.com" required>
+            </div>
+            <div class="field">
+              <label>Password *</label>
+              <input type="password" name="password" placeholder="Min 6 chars" required>
+            </div>
+            <div class="field">
+              <label>Role</label>
+              <select name="role">
+                <option value="standard_user">Standard User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <label class="check-row"><input type="checkbox" name="is_student"> Grant student status</label>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:14px">Create User</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div><span class="kicker">{{ users|length }} accounts</span><h2>Manage Users</h2></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="search-bar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="userSearch" type="search" placeholder="Search users…">
+            </div>
+            <select id="userRoleFilter" class="select-inline">
+              <option value="">All roles</option>
+              <option value="admin">Admin</option>
+              <option value="standard_user">Standard</option>
+            </select>
+            <select id="userStudentFilter" class="select-inline">
+              <option value="">All users</option>
+              <option value="1">Students only</option>
+              <option value="0">Non-students</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="usersTable">
+            <thead>
+              <tr><th>#</th><th>Username</th><th>Email</th><th>Role</th><th>Student</th><th>Joined</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for u in (users or []) %}
+              {# ── FIX: replaced session.get('user_id') with current_user_id
+                        which is injected by the context processor. Flask does
+                        not expose `session` as a Jinja2 global by default. ── #}
+              <tr data-role="{{ u.role }}" data-student="{{ u.is_student|int }}">
+                <td class="cell-mono">{{ u.id }}</td>
+                <td class="cell-name">{{ u.name }}</td>
+                <td class="cell-mono" style="color:var(--muted)">{{ u.email }}</td>
+                <td>
+                  {% if u.id != current_user_id %}
+                  <form method="POST" action="{{ url_for('admin_update_user_role', user_id=u.id) }}" style="display:inline">
+                    <div class="action-row">
+                      <select name="role" class="select-inline">
+                        <option value="standard_user" {% if u.role=='standard_user' %}selected{% endif %}>Standard</option>
+                        <option value="admin"         {% if u.role=='admin'         %}selected{% endif %}>Admin</option>
+                      </select>
+                      <button class="btn btn-ghost btn-sm" type="submit">Save</button>
+                    </div>
+                  </form>
+                  {% else %}
+                  <span class="badge badge-admin">You</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form method="POST" action="{{ url_for('admin_toggle_student', user_id=u.id) }}" style="display:inline">
+                    <button class="btn btn-sm {% if u.is_student %}btn-primary{% else %}btn-ghost{% endif %}" type="submit"
+                            title="{{ 'Remove student status' if u.is_student else 'Grant student status' }}">
+                      {% if u.is_student %}✓ Student{% else %}+ Student{% endif %}
+                    </button>
+                  </form>
+                </td>
+                <td class="cell-mono" style="font-size:.72rem">{{ u.created_at or '—' }}</td>
+                <td>
+                  {% if u.id != current_user_id %}
+                  <form method="POST" action="{{ url_for('admin_delete_user', user_id=u.id) }}"
+                        onsubmit="return confirm('Delete user {{ u.name }}? This cannot be undone.')">
+                    <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                  </form>
+                  {% else %}
+                  <span class="cell-mono">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="7" class="empty">No users</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REPORTS ══════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-reports">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><div><span class="kicker">Finance</span><h2>Revenue per Event</h2></div></div>
+          {% set max_r = namespace(v=1) %}
+          {% for r in (revenue_per_event or []) %}{% if r.total_revenue|float > max_r.v %}{% set max_r.v = r.total_revenue|float %}{% endif %}{% endfor %}
+          {% for r in (revenue_per_event or [])[:12] %}
+          <div class="report-row">
+            <span class="report-label" title="{{ r.event_name }}">{{ r.event_name }}</span>
+            <div class="report-bar-wrap">
+              <div class="report-bar bar-revenue" style="animation-delay:{{ loop.index0 * 60 }}ms;--bar-w:{{ ((r.total_revenue|float / max_r.v)*100)|round }}%"></div>
+            </div>
+            <span class="report-val" style="color:var(--green)">£{{ "%.0f"|format(r.total_revenue|float) }}</span>
+          </div>
+          {% else %}<div class="empty"><div class="empty-icon">📊</div>No revenue data</div>{% endfor %}
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div><span class="kicker">Popularity</span><h2>Bookings per Event</h2></div></div>
+          {% set max_b = namespace(v=1) %}
+          {% for r in (revenue_per_event or []) %}{% if r.total_bookings|int > max_b.v %}{% set max_b.v = r.total_bookings|int %}{% endif %}{% endfor %}
+          {% for r in (revenue_per_event or [])[:12] %}
+          <div class="report-row">
+            <span class="report-label" title="{{ r.event_name }}">{{ r.event_name }}</span>
+            <div class="report-bar-wrap">
+              <div class="report-bar bar-bookings" style="animation-delay:{{ loop.index0 * 60 }}ms;--bar-w:{{ ((r.total_bookings|int / max_b.v)*100)|round }}%"></div>
+            </div>
+            <span class="report-val" style="color:var(--yellow)">{{ r.total_bookings }}</span>
+          </div>
+          {% else %}<div class="empty"><div class="empty-icon">📋</div>No data</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div><span class="kicker">Utilisation</span><h2>Events per Venue</h2></div></div>
+        {% set max_v = namespace(v=1) %}
+        {% for r in (venue_usage or []) %}{% if r.total_events|int > max_v.v %}{% set max_v.v = r.total_events|int %}{% endif %}{% endfor %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0 32px">
+          {% for r in (venue_usage or []) %}
+          <div class="report-row">
+            <span class="report-label">{{ r.venue_name }}</span>
+            <div class="report-bar-wrap">
+              <div class="report-bar bar-venue" style="animation-delay:{{ loop.index0 * 60 }}ms;--bar-w:{{ ((r.total_events|int / max_v.v)*100)|round }}%"></div>
+            </div>
+            <span class="report-val" style="color:var(--orange)">{{ r.total_events }}</span>
+          </div>
+          {% else %}<div class="empty"><div class="empty-icon">🏟️</div>No venue data</div>{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUDIT LOG ════════════════════════════════════════════ -->
+    <div class="tab-content" id="tab-logs">
+      <div class="panel">
+        <div class="panel-header">
+          <div><span class="kicker">Admin activity</span><h2>Audit Log</h2></div>
+          <div class="search-bar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="logSearch" type="search" placeholder="Search logs…">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="logsTable">
+            <thead><tr><th>#</th><th>Admin</th><th>Action</th><th>Timestamp</th></tr></thead>
+            <tbody>
+              {% for l in (logs or []) %}
+              <tr>
+                <td class="cell-mono">{{ l.log_id }}</td>
+                <td class="cell-name">{{ l.admin }}</td>
+                <td>{{ l.action }}</td>
+                <td class="cell-mono" style="font-size:.72rem">{{ l.created_at }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="empty">No log entries yet</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ══ EDIT EVENT MODAL ══════════════════════════════════════════ -->
+<div class="modal" id="editEventModal">
+  <div class="modal-scrim" onclick="closeModal('editEventModal')"></div>
+  <div class="modal-dialog">
+    <div class="modal-head">
+      <div><span class="kicker">Edit</span><h2 id="editModalTitle">Edit Event</h2></div>
+      <button class="icon-action danger" onclick="closeModal('editEventModal')" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form method="POST" id="editEventForm">
+      <div class="form-grid">
+        <div class="field form-full"><label>Event name *</label><input type="text" name="event_name" id="editName" required></div>
+        <div class="field">
+          <label>Category *</label>
+          <select name="category_id" id="editCategory" required>
+            {% for cat in (categories or []) %}
+            <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Venue *</label>
+          <select name="venue_id" id="editVenue" required>
+            {% for v in (venues or []) %}
+            <option value="{{ v.id }}">{{ v.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field"><label>Start *</label><input type="datetime-local" name="start_datetime" id="editStart" required></div>
+        <div class="field"><label>End *</label><input type="datetime-local" name="end_datetime" id="editEnd" required></div>
+        <div class="field"><label>Last booking date *</label><input type="date" name="last_booking_date" id="editLastBook" required></div>
+        <div class="field"><label>Base price (£) *</label><input type="number" step="0.01" min="0" name="base_price" id="editPrice" required></div>
+        <div class="field"><label>Total tickets *</label><input type="number" min="1" name="total_tickets" id="editTickets" required></div>
+        <div class="field form-full"><label>Description</label><textarea name="description" id="editDesc"></textarea></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ CAPACITY MODAL ════════════════════════════════════════════ -->
+<div class="modal" id="capacityModal">
+  <div class="modal-scrim" onclick="closeModal('capacityModal')"></div>
+  <div class="modal-dialog" style="max-width:420px">
+    <div class="modal-head">
+      <div><span class="kicker">Adjust capacity</span><h2 id="capModalTitle">Set Capacity</h2></div>
+      <button class="icon-action danger" onclick="closeModal('capacityModal')" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form method="POST" id="capacityForm">
+      <div class="field">
+        <label>New total capacity *</label>
+        <input type="number" name="total_tickets" id="capInput" min="1" required>
+      </div>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:8px">Remaining tickets will be recalculated automatically based on confirmed bookings.</p>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:14px">Update Capacity</button>
+    </form>
+  </div>
+</div>
+
+<div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+
+<div style="position:fixed;bottom:12px;left:calc(var(--sidebar-w) + 12px);font-family:'DM Mono',monospace;font-size:.62rem;color:var(--faint);pointer-events:none;z-index:10">
+  ⌘1–7 tabs · ESC close modal
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

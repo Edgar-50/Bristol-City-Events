@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>BCE Events</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/events.css') }}">
+</head>
+
+<body>
+
+<header class="header">
+  <img src="{{ url_for('static', filename='assets/logo.png') }}" class="logo">
+
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('events') }}" class="active">Events</a>
+    <a href="{{ url_for('about') }}">About</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Explore Bristol Events</h1>
+  <p>Find and book events happening near you</p>
+</section>
+
+<section class="filters">
+  <input id="search" placeholder="Search events...">
+</section>
+
+<main id="events-grid">
+
+  {% if events %}
+    {% for ev in events %}
+      <div class="card">
+        <div class="card-content">
+          <h2>{{ ev.title }}</h2>
+          <p>{{ ev.description }}</p>
+
+          <div class="meta">
+            <span>{{ ev.date }}</span>
+            <span>{{ ev.location }}</span>
+          </div>
+
+          <div class="bottom">
+            <strong>
+              {% if ev.price == 0 %}
+                FREE
+              {% else %}
+                £{{ "%.2f"|format(ev.price) }}
+              {% endif %}
+            </strong>
+
+            <button class="book-btn" data-id="{{ ev.id }}">
+              Book
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No events available</p>
+  {% endif %}
+
+</main>
+
+<script src="{{ url_for('static', filename='js/events.js') }}"></script>
+</body>
+</html>

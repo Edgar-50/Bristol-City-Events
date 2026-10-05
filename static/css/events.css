@@ -1,0 +1,85 @@
+body {
+  margin:0;
+  font-family:Poppins;
+  background:#0a0a0a;
+  color:white;
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  padding:15px 30px;
+  background:#111;
+}
+
+.logo { height:40px; }
+
+nav a {
+  margin-left:20px;
+  color:white;
+  text-decoration:none;
+}
+
+nav a.active {
+  color:#ff0080;
+}
+
+.hero {
+  text-align:center;
+  padding:60px 20px;
+}
+
+.filters {
+  text-align:center;
+  margin:20px;
+}
+
+#search {
+  padding:10px;
+  width:300px;
+  border-radius:20px;
+  border:none;
+}
+
+#events-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+  padding:30px;
+}
+
+.card {
+  background:#111;
+  border-radius:15px;
+  padding:20px;
+  transition:0.3s;
+}
+
+.card:hover {
+  transform:translateY(-5px);
+}
+
+.meta {
+  display:flex;
+  justify-content:space-between;
+  color:#aaa;
+}
+
+.bottom {
+  display:flex;
+  justify-content:space-between;
+  margin-top:15px;
+}
+
+.book-btn {
+  background:#ff0080;
+  border:none;
+  padding:8px 14px;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+}
+
+.book-btn:hover {
+  background:#ff4da6;
+}

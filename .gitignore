@@ -1,0 +1,10 @@
+@"
+.env
+__pycache__/
+*.pyc
+instance/
+static/assets/bg-video.mp4
+"@ | Set-Content .gitignore.venv/
+venv/
+.idea/
+.vscode/
