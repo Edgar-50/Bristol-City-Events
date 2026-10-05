@@ -41,10 +41,16 @@
   </header>
 
   <section class="hero">
-    <video autoplay muted loop playsinline preload="auto" class="hero-video">
-      <source src="{{ url_for('static', filename='assets/bg-video.mp4') }}" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
+    <div class="hero-video-wrapper" aria-hidden="true">
+      <iframe
+        class="hero-video"
+        src="https://www.youtube.com/embed/r4udNVSXrAU?autoplay=1&mute=1&loop=1&playlist=r4udNVSXrAU&controls=0&rel=0&playsinline=1&disablekb=1"
+        title="Bristol City Events Background Video"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        tabindex="-1">
+      </iframe>
+    </div>
 
     <div class="hero-content">
       <h1>Bristol City Events</h1>
