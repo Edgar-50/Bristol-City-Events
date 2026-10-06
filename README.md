@@ -25,21 +25,83 @@
 
 ---
 
-## Homepage Preview
+## 🖥️ Application Showcase
 
-### Hero experience
+The interface below represents the live BCE experience rather than design mock-ups. The screenshots are taken from the deployed application and cover the major public-facing experiences.
 
-<p align="center">
-  <img src="docs/screenshots/homepage-hero.svg" alt="Bristol City Events homepage hero preview" width="100%">
-</p>
-
-### City highlights
+### 🏙️ Bristol City Events — Homepage
 
 <p align="center">
-  <img src="docs/screenshots/homepage-highlights.svg" alt="Bristol City Events homepage highlights preview" width="100%">
+  <a href="https://bristol-city-events.onrender.com">
+    <img src="https://image.thum.io/get/width/1600/crop/900/noanimate/https://bristol-city-events.onrender.com/" alt="Bristol City Events live homepage" width="100%">
+  </a>
 </p>
 
-The homepage combines the pill-style navigation, a cinematic YouTube-powered hero background, event discovery CTA, Bristol highlights, event statistics and responsive dark/light presentation.
+The homepage is designed as the main discovery surface for BCE. It combines a cinematic Bristol hero, primary navigation, the **Discover Events** call-to-action, City Highlights and the visual identity used throughout the platform.
+
+**What this demonstrates**
+- Hosted cinematic hero experience without committing the original ~269 MB video to Git.
+- Responsive pill-style navigation.
+- Bristol-focused branding and event discovery.
+- Light/dark presentation support.
+- Clear CTA path into the event catalogue.
+
+### 🗺️ Interactive Bristol Explorer
+
+<p align="center">
+  <a href="https://bristol-city-events.onrender.com/explore">
+    <img src="https://image.thum.io/get/width/1600/crop/900/noanimate/https://bristol-city-events.onrender.com/explore" alt="BCE interactive Bristol explorer" width="100%">
+  </a>
+</p>
+
+The Explore experience moves BCE beyond a conventional event list. It provides a location-oriented way to discover the city and puts events into a real Bristol context.
+
+**What this demonstrates**
+- Interactive Bristol map experience.
+- Location-aware discovery interface.
+- Integrated navigation between Events, Explore, About and Contact.
+- Dark-mode compatible UI.
+- A platform architecture capable of expanding into proximity and venue-based discovery.
+
+### ✉️ Contact Experience
+
+<p align="center">
+  <a href="https://bristol-city-events.onrender.com/contact">
+    <img src="https://image.thum.io/get/width/1600/crop/900/noanimate/https://bristol-city-events.onrender.com/contact" alt="BCE contact experience" width="100%">
+  </a>
+</p>
+
+The Contact page keeps the visual system consistent with the rest of the application while providing a dedicated communication path for questions, ideas and feedback.
+
+**What this demonstrates**
+- Reusable navigation/component styling.
+- Responsive layout.
+- Consistent theme implementation.
+- Clear interaction hierarchy and CTA design.
+
+### 🌗 City Highlights & Theme System
+
+BCE includes dedicated light and dark presentation states. City Highlights uses Bristol-focused cards such as the International Balloon Fiesta, street art experiences, Bristol Winter Market and Harbourside events to give the homepage a richer destination-discovery feel.
+
+**Theme system highlights**
+- Light and dark experiences rather than a single static skin.
+- High-contrast card layouts.
+- Responsive horizontal discovery sections.
+- Shared visual language across public pages.
+- Bristol-specific imagery and attraction/event content.
+
+### 👥 Connect & Discover
+
+The application also includes a community-oriented **Connect & Discover** experience where activity such as purchases, hosted events and upcoming plans can be surfaced in a social-style feed.
+
+**What this demonstrates**
+- Community/social discovery layer.
+- Event-related activity presentation.
+- Reusable profile/activity components.
+- A foundation for richer recommendations, follows and notifications.
+
+> **Live application:** [bristol-city-events.onrender.com](https://bristol-city-events.onrender.com)
+
 
 ---
 
