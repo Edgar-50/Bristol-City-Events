@@ -12,7 +12,14 @@
 
 **BCE** brings event discovery, ticketing, user accounts, admin operations, receipts, waiting lists and reporting into one Flask application.
 
-[Live Demo](https://bristol-city-events.onrender.com) • [Repository](https://github.com/Edgar-50/Bristol-City-Events)
+## 🌐 Live Production Deployment
+
+### **[Launch Bristol City Events →](https://bristol-city-events.onrender.com)**
+
+**Production URL:** https://bristol-city-events.onrender.com  
+**Repository:** https://github.com/Edgar-50/Bristol-City-Events  
+**Runtime:** Python 3.12 + Gunicorn on Render  
+**Project status:** Active development / production deployment
 
 </div>
 
@@ -100,32 +107,100 @@ Bristol-City-Events/
 
 ---
 
-## Feature Highlights
+## Implemented Platform Capabilities
 
-### Event experience
-- Discover featured Bristol events.
-- Browse event listings and explore city experiences.
-- Responsive UI with dark/light presentation.
-- Cinematic homepage background delivered through YouTube instead of storing a massive video file in Git.
+BCE has evolved beyond a basic events CRUD application into a broader event-discovery, ticketing and operations platform.
 
-### Booking engine
-- Create bookings against available event capacity.
-- Handle waiting-list scenarios when events fill.
-- Cancel bookings through the application workflow.
-- Provide realtime booking-related updates through Socket.IO.
+### 🎟️ Event discovery & booking
+- Bristol-focused event discovery and featured-event experiences.
+- Capacity-aware event booking workflow.
+- Waiting-list handling for fully booked events.
+- Booking cancellation workflow.
+- Ticket and availability state management.
+- Responsive event browsing across desktop and mobile layouts.
 
-### User workspace
+### 👤 User experience
+- User registration and secure login.
 - Session-based authentication.
 - Personal user dashboard.
-- Booking history and account-focused views.
-- Receipt generation for completed bookings.
+- Booking history and account activity views.
+- PDF receipt generation for completed bookings.
+- Light and dark presentation modes.
 
-### Admin command centre
-- Administrative dashboard and protected routes.
+### 🛡️ Administration & operations
+- Protected administrative routes.
+- Advanced admin dashboard.
 - User and role management.
-- Event management.
-- Venue/category-oriented operational tooling.
-- Reports covering bookings, attendance and revenue.
+- Event CRUD and operational event management.
+- Venue/category-oriented management tools.
+- Booking oversight and capacity monitoring.
+- Revenue, booking and event reporting.
+
+### ⚡ Realtime & interactive features
+- Flask-SocketIO realtime updates.
+- Interactive Bristol exploration experience.
+- Dynamic frontend behaviour with JavaScript.
+- Community-oriented **Connect & Discover** experience.
+- Cinematic homepage presentation using a hosted YouTube hero source instead of storing a ~269 MB video in Git.
+
+### 📊 Analytics & reporting
+- Booking analytics.
+- Revenue reporting.
+- Event performance reporting.
+- Operational dashboard views.
+- PDF receipt/document generation with ReportLab.
+
+### 🚀 Production engineering
+- Gunicorn production server configuration.
+- Render deployment.
+- Environment-based secret configuration.
+- `.gitignore` protection for local/runtime files.
+- GitHub-based source control and deployment workflow.
+- Large binary media removed from Git workflow in favour of hosted media.
+
+---
+
+## AI-Assisted Development
+
+AI-assisted engineering tools were used as part of the BCE development workflow for tasks such as debugging, code review, refactoring, deployment troubleshooting, dependency correction, documentation, security cleanup and Git/GitHub workflow optimisation.
+
+AI support is used as an engineering accelerator rather than a replacement for project ownership. Architecture, feature direction, integration decisions, testing choices and final implementation remain part of the BCE development process.
+
+### Development areas supported by AI tooling
+- Debugging Flask routes and application behaviour.
+- Reviewing backend/frontend integration.
+- Refactoring and maintainability improvements.
+- Deployment and Render troubleshooting.
+- Dependency and runtime compatibility checks.
+- Git/GitHub workflow assistance.
+- README and technical documentation refinement.
+- Security hygiene such as environment-variable migration and secret cleanup.
+
+---
+
+## Current Implementation Status
+
+| Capability | Status |
+|---|---|
+| Full-stack Flask application | ✅ Implemented |
+| MySQL / PyMySQL data layer | ✅ Implemented |
+| Registration & login | ✅ Implemented |
+| Session authentication | ✅ Implemented |
+| Role-based user/admin access | ✅ Implemented |
+| User dashboard | ✅ Implemented |
+| Admin dashboard | ✅ Implemented |
+| Event management | ✅ Implemented |
+| Booking workflow | ✅ Implemented |
+| Waiting-list workflow | ✅ Implemented |
+| Booking cancellation flow | ✅ Implemented |
+| PDF receipts | ✅ Implemented |
+| Flask-SocketIO realtime updates | ✅ Implemented |
+| Reporting & analytics | ✅ Implemented |
+| Interactive Bristol exploration | ✅ Implemented |
+| Responsive light/dark UI | ✅ Implemented |
+| YouTube-hosted cinematic hero | ✅ Implemented |
+| Gunicorn production configuration | ✅ Implemented |
+| Render deployment | ✅ Live |
 
 ---
 
@@ -229,16 +304,18 @@ Sensitive values such as database credentials and Flask secrets are configured t
 
 ---
 
-## Roadmap
+## Next-Stage Roadmap
 
-- [ ] Complete hosted MySQL production configuration
-- [ ] Add automated tests for booking and authentication flows
-- [ ] Add CI checks with GitHub Actions
-- [ ] Add richer admin analytics visualisations
-- [ ] Add email booking confirmations
-- [ ] Add QR-based ticket validation
-- [ ] Add event recommendation features
-- [ ] Add Docker deployment option
+The core platform is already functional and deployed. Future development can focus on extending production depth rather than rebuilding completed capabilities.
+
+- [ ] Automated integration and end-to-end test coverage.
+- [ ] CI quality gates with GitHub Actions.
+- [ ] Email / notification workflows for booking lifecycle events.
+- [ ] QR-based ticket validation at venue entry.
+- [ ] Personalised event recommendation models.
+- [ ] Expanded admin visual analytics.
+- [ ] Containerised deployment option with Docker.
+- [ ] Broader production observability, monitoring and audit tooling.
 
 ---
 
